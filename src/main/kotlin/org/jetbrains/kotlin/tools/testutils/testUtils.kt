@@ -31,7 +31,6 @@ import com.intellij.openapi.util.io.FileUtil
 import com.intellij.openapi.util.registry.Registry
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.util.ThreeState
-import org.jetbrains.jps.incremental.storage.ProjectStamps
 import org.jetbrains.kotlin.tools.gradleimportcmd.GradleModelBuilderOverheadContainer
 import org.jetbrains.plugins.gradle.settings.DistributionType
 import org.jetbrains.plugins.gradle.settings.GradleProjectSettings
@@ -210,14 +209,14 @@ fun buildProject(project: Project?): Boolean {
             }
         }
 
-        // Configure build manager
-
-//        val buildManager = BuildManager.getInstance()
-        printMessage("compiler.build.portable.caches=" + Registry.get("compiler.build.portable.caches"))
+        printMessage("Enable portable build caches")
+        printMessage(Registry.get("compiler.build.portable.caches").toString())
         Registry.get("compiler.build.portable.caches").setValue(true)
-        printMessage("compiler.build.portable.caches=" + Registry.get("compiler.build.portable.caches"))
-
-//        if (!buildManager.isGeneratePortableCachesEnabled()) buildManager.setGeneratePortableCachesEnabled(true)
+        if(Registry.get("compiler.build.portable.caches").asBoolean()) {
+            printMessage("Done: " + Registry.get("compiler.build.portable.caches"))
+        } else {
+            printMessage("Can't enable portable build caches", MessageStatus.ERROR)
+        }
 
         CompilerConfigurationImpl.getInstance(project).setBuildProcessHeapSize(3500)
         CompilerWorkspaceConfiguration.getInstance(project).PARALLEL_COMPILATION = true
@@ -231,6 +230,7 @@ fun buildProject(project: Project?): Boolean {
             printProgress("Compilation status: Errors: ${compileContext.getMessages(CompilerMessageCategory.ERROR).size}. Warnings: ${compileContext.getMessages(CompilerMessageCategory.WARNING).size}.")
         }
 
+        // Copy compile-server folder with portable caches to the root for further uploading
         val cachesFolder: File = BuildManager.getInstance().getProjectSystemDirectory(project)!!
         val basePath = File(project.basePath!!)
         if (basePath.exists()) {
