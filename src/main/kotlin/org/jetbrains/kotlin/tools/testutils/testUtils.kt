@@ -28,9 +28,10 @@ import com.intellij.openapi.projectRoots.ProjectJdkTable
 import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.util.Computable
 import com.intellij.openapi.util.io.FileUtil
+import com.intellij.openapi.util.registry.Registry
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.util.ThreeState
-import org.jetbrains.kotlin.idea.statistics.newFileTemplateEvents
+import org.jetbrains.jps.incremental.storage.ProjectStamps
 import org.jetbrains.kotlin.tools.gradleimportcmd.GradleModelBuilderOverheadContainer
 import org.jetbrains.plugins.gradle.settings.DistributionType
 import org.jetbrains.plugins.gradle.settings.GradleProjectSettings
@@ -208,6 +209,15 @@ fun buildProject(project: Project?): Boolean {
                 }
             }
         }
+
+        // Configure build manager
+
+//        val buildManager = BuildManager.getInstance()
+        printMessage("compiler.build.portable.caches=" + Registry.get("compiler.build.portable.caches"))
+        Registry.get("compiler.build.portable.caches").setValue(true)
+        printMessage("compiler.build.portable.caches=" + Registry.get("compiler.build.portable.caches"))
+
+//        if (!buildManager.isGeneratePortableCachesEnabled()) buildManager.setGeneratePortableCachesEnabled(true)
 
         CompilerConfigurationImpl.getInstance(project).setBuildProcessHeapSize(3500)
         CompilerWorkspaceConfiguration.getInstance(project).PARALLEL_COMPILATION = true
