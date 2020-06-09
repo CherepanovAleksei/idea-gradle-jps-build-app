@@ -37,7 +37,8 @@ intellij {
     def ideVersion = System.getenv("ide_version")
     if (ideVersion == null) {
       println(">>>Its null")
-      ideVersion = '201.7223.91'
+      //ideVersion = '201.7846.53'
+      ideVersion = 'IC-2020.1.2'
     } else {
       println("Using IDE: $ideVersion")
     }
